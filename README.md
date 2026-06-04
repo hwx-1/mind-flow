@@ -850,5 +850,5 @@ server {
 
 <div align="center">
   <p>如果你觉得 <strong>心晴 (Mind Flow)</strong> 为你的全栈大模型应用开发带来了启发，请在 GitHub 为本项目点亮一颗 ⭐️！</p>
-  <p>版权所有 © 2026 心晴开源研发团队。遵循 MIT 开源许可协议。</p>
+  <p>版权所有 © 2026 新速开源研发团队。遵循 MIT 开源许可协议。</p>
 </div>
