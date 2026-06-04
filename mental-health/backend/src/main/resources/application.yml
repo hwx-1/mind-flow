@@ -1,0 +1,80 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: mental-health
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/mental_health?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    username: mental
+    password: ChangeMe_2026!
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: ''
+      database: 0
+      timeout: 5s
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 200MB
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.mental.health.entity
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      logic-delete-field: status
+      logic-not-delete-value: 1
+      logic-delete-value: 0
+
+# JWT
+jwt:
+  secret: mental-health-super-secret-key-please-change-in-prod-2026
+  expiration: 86400         # 1 天 (秒)
+  refresh-expiration: 604800 # 7 天
+
+# 文件上传
+upload:
+  storage: ${UPLOAD_STORAGE:oss}
+  # 容器内路径；用 docker / 宝塔时挂载到 /www/wwwroot/static
+  path: /www/wwwroot/static
+  # 公网访问前缀
+  url-prefix: http://39.96.36.94/static
+  oss:
+    endpoint: ${ALIYUN_OSS_ENDPOINT:https://oss-cn-beijing-internal.aliyuncs.com}
+    public-endpoint: ${ALIYUN_OSS_PUBLIC_ENDPOINT:https://mental-healthy.oss-cn-beijing.aliyuncs.com}
+    bucket: ${ALIYUN_OSS_BUCKET:mental-healthy}
+    access-key-id: ${ALIYUN_OSS_ACCESS_KEY_ID:}
+    access-key-secret: ${ALIYUN_OSS_ACCESS_KEY_SECRET:}
+    prefix: ${ALIYUN_OSS_PREFIX:mental-health/}
+
+# DeepSeek
+ai:
+  deepseek:
+    api-key: sk-REPLACE_WITH_YOUR_KEY
+    base-url: https://api.deepseek.com
+    model: deepseek-chat
+    timeout: 60
+
+sms:
+  ihuyi:
+    enabled: true
+    url: https://api.ihuyi.com/sms/Submit.json
+    account: ${IHUYI_SMS_ACCOUNT:C54402489}
+    password: ${IHUYI_SMS_PASSWORD:}
+    template-id: ${IHUYI_SMS_TEMPLATE_ID:1}
+    ttl-seconds: 300
+    min-interval-seconds: 60
+
+logging:
+  level:
+    com.mental.health: debug
+    org.springframework.security: info

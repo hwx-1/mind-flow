@@ -1,0 +1,17 @@
+{
+  "src": [
+    "pages/Index",
+    "view/auth/LoginPage",
+    "view/auth/RegisterPage",
+    "view/community/PostDetailPage",
+    "view/community/PublishPage",
+    "view/community/UserPostsPage",
+    "view/ai/ChatPage",
+    "view/ai/HistoryPage",
+    "view/message/ChatRoomPage",
+    "view/mine/SettingsPage",
+    "view/mine/ProfileEditPage",
+    "view/mine/MyPostsPage",
+    "view/mine/MyCommentsPage"
+  ]
+}
