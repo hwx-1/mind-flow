@@ -1,0 +1,23 @@
+# 发布混淆/优化规则（HarmonyOS source obfuscation）
+# 文档：https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/source-obfuscation
+#
+# 设计原则：本项目大量使用「JSON 反序列化为 interface（如 PostVo/UserVo）」与
+# 「字符串路由（router.pushUrl 的 url 路径）」「AppStorage 字符串键」，
+# 因此默认只做「压缩 + 去日志」这类零风险优化，
+# 不开启会改名的属性/文件名/导出混淆，避免线上反序列化/路由失效。
+
+# ===== 默认开启（安全，可减小体积、去除日志）=====
+-compact            # 去除多余空白与换行，减小包体
+-remove-log         # 移除所有 console.* / hilog 调用，避免泄露日志、减小体积
+
+# ===== 如需更强混淆，请逐项开启并充分真机测试（有风险，谨慎）=====
+# -enable-toplevel-obfuscation     # 顶层名称混淆（一般可用，建议测试）
+# -enable-property-obfuscation     # 属性名混淆：会破坏 JSON 字段映射，必须配合下面 keep
+# -enable-export-obfuscation
+# -enable-filename-obfuscation     # 文件名混淆：可能影响按路径的页面路由，谨慎
+
+# 若开启 -enable-property-obfuscation，务必保留所有网络模型字段名，例如：
+# -keep-property-name
+#   id userId nickname avatar content images video topic likeCount commentCount
+#   liked collected createdAt fromUser toUser type token refreshToken url
+#   code msg data title status

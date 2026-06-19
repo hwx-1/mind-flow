@@ -1,0 +1,56 @@
+{
+  "app": {
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "storeFile": "/Users/hhhwenxin/Desktop/MentalHealth.p12",
+          "storePassword": "0000001F3BB54B133A0535604BBF8259D7B5C1E63912953CEEE9E0822A1AEEA16B514112203F12F772F68431C02A39",
+          "keyAlias": "xinqing",
+          "keyPassword": "0000001FB53E3C5951480014776A7AC22B4C5C3DBE0A6C72DCC520DF20A44CEBFD17A4FE0948EA8EEA33425ABD73FE",
+          "signAlg": "SHA256withECDSA",
+          "profile": "/Users/hhhwenxin/Downloads/MentalHealthRelease.p7b",
+          "certpath": "/Users/hhhwenxin/Downloads/%E5%BF%83%E6%99%B4.cer"
+        }
+      }
+    ],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        "targetSdkVersion": "6.0.2(22)",
+        "compatibleSdkVersion": "6.0.2(22)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": true
+          }
+        }
+      }
+    ],
+    "buildModeSet": [
+      {
+        "name": "debug",
+      },
+      {
+        "name": "release"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    }
+  ]
+}

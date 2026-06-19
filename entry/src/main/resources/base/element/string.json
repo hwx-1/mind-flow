@@ -1,0 +1,11 @@
+{
+  "string": [
+    { "name": "module_desc", "value": "AI 心理健康助手" },
+    { "name": "EntryAbility_desc", "value": "首页" },
+    { "name": "EntryAbility_label", "value": "心晴" },
+    { "name": "perm_location", "value": "用于发帖时获取当前位置" },
+    { "name": "perm_media", "value": "用于发帖时选择图片和视频" },
+    { "name": "perm_camera", "value": "用于拍摄发帖" },
+    { "name": "perm_mic", "value": "用于录音消息" }
+  ]
+}
