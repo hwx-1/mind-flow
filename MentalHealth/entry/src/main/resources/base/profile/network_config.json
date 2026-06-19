@@ -1,0 +1,13 @@
+{
+  "network-security-config": {
+    "domain-config": [
+      {
+        "domains": [
+          { "include-subdomains": true, "name": "39.96.36.94" },
+          { "include-subdomains": true, "name": "localhost" }
+        ],
+        "cleartext-traffic-permitted": true
+      }
+    ]
+  }
+}

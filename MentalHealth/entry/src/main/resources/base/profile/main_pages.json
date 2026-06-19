@@ -1,0 +1,24 @@
+{
+  "src": [
+    "pages/Index",
+    "view/auth/LoginPage",
+    "view/auth/RegisterPage",
+    "view/community/PostDetailPage",
+    "view/community/PublishPage",
+    "view/community/LocationPickerPage",
+    "view/community/SearchPage",
+    "view/community/UserPostsPage",
+    "view/ai/ChatPage",
+    "view/ai/HistoryPage",
+    "view/message/AddFriendPage",
+    "view/message/FriendListPage",
+    "view/message/ChatRoomPage",
+    "view/mine/SettingsPage",
+    "view/mine/ThemeColorPage",
+    "view/common/ImagePreviewPage",
+    "view/mine/ProfileEditPage",
+    "view/mine/MyPostsPage",
+    "view/mine/MyLikesPage",
+    "view/mine/MyCommentsPage"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "color": [
+    { "name": "start_window_background", "value": "#FFFFFFFF" },
+    { "name": "primary", "value": "#FF6B8AFF" },
+    { "name": "primary_light", "value": "#FFE8EEFF" },
+    { "name": "text_main", "value": "#FF1F2937" },
+    { "name": "text_sub", "value": "#FF6B7280" },
+    { "name": "divider", "value": "#FFF3F4F6" },
+    { "name": "bg_page", "value": "#FFF9FAFB" },
+    { "name": "danger", "value": "#FFEF4444" }
+  ]
+}

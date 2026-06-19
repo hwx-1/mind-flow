@@ -1,0 +1,22 @@
+{
+  "color": [
+    {
+      "name": "start_window_background",
+      "value": "#000000"
+    },
+    { "name": "primary", "value": "#FFD98E73" },
+    { "name": "primary_light", "value": "#FF3B3129" },
+    { "name": "accent", "value": "#FF9CAF88" },
+    { "name": "accent_deep", "value": "#FF7D9268" },
+    { "name": "gold", "value": "#FFE0B87F" },
+    { "name": "blush", "value": "#FF5B4037" },
+    { "name": "clay", "value": "#FFBFA996" },
+    { "name": "text_main", "value": "#FFF7EFE5" },
+    { "name": "text_sub", "value": "#FFC2B5A7" },
+    { "name": "divider", "value": "#FF4A3F35" },
+    { "name": "bg_page", "value": "#FF211B17" },
+    { "name": "danger", "value": "#FFE07A61" },
+    { "name": "glass_tint", "value": "#D92A231E" },
+    { "name": "card_bg", "value": "#FF2B241F" }
+  ]
+}

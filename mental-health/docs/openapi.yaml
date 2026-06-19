@@ -1,0 +1,556 @@
+openapi: 3.0.3
+info:
+  title: AI 心理健康助手 API
+  description: |
+    鸿蒙端 + Web 端共用接口。
+    - 鉴权方式：JWT，请求头 `Authorization: Bearer <token>`
+    - 文件上传：multipart/form-data
+    - AI 流式：SSE（text/event-stream）
+    - 实时消息：WebSocket `wss://39.96.36.94/ws/im?token=xxx`
+  version: 1.0.0
+  contact:
+    name: hwx-1
+servers:
+  - url: http://39.96.36.94:8080/api
+    description: 生产环境
+  - url: http://localhost:8080/api
+    description: 本地开发
+
+tags:
+  - name: Auth
+    description: 注册 / 登录 / Token
+  - name: User
+    description: 用户资料
+  - name: Upload
+    description: 图片 / 视频 / 头像
+  - name: Community
+    description: 帖子 / 评论 / 点赞 / 收藏
+  - name: AI
+    description: AI 咨询（心理 / 学习 / 综合）
+  - name: Message
+    description: 通知 / 私信
+
+paths:
+  # ============ Auth ============
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: 注册
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password, phone]
+              properties:
+                username: { type: string, example: xiaoming }
+                password: { type: string, format: password, example: "123456" }
+                phone: { type: string, example: "13800138000" }
+                code: { type: string, example: "1234", description: 短信验证码（可选） }
+      responses:
+        '200':
+          description: 注册成功
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LoginResult' }
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: 登录（用户名/手机号 + 密码）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [account, password]
+              properties:
+                account: { type: string, example: xiaoming }
+                password: { type: string, format: password }
+      responses:
+        '200':
+          description: 登录成功
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiResult' }
+
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      summary: 刷新 Token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshToken: { type: string }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/ApiResult' } } } }
+
+  /auth/code:
+    post:
+      tags: [Auth]
+      summary: 发送短信验证码
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                phone: { type: string }
+      responses:
+        '200': { description: OK }
+
+  # ============ User ============
+  /user/profile:
+    get:
+      tags: [User]
+      summary: 获取我的资料
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiResult' }
+
+  /user/profile/{userId}:
+    get:
+      tags: [User]
+      summary: 获取他人资料
+      parameters:
+        - { name: userId, in: path, required: true, schema: { type: integer } }
+      responses:
+        '200': { description: OK }
+
+  /user/update:
+    put:
+      tags: [User]
+      summary: 更新资料
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nickname: { type: string }
+                avatar: { type: string }
+                bio: { type: string }
+                gender: { type: integer, enum: [0, 1, 2] }
+                birthday: { type: string, format: date }
+      responses:
+        '200': { description: OK }
+
+  /user/password:
+    put:
+      tags: [User]
+      summary: 修改密码
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                oldPassword: { type: string }
+                newPassword: { type: string }
+      responses:
+        '200': { description: OK }
+
+  /user/friends:
+    get:
+      tags: [User]
+      summary: 获取好友列表
+      description: 通讯录好友列表，包含头像、昵称、个人状态与 WebSocket 在线状态。
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResult'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id: { type: integer }
+                            uid: { type: integer }
+                            username: { type: string }
+                            nickname: { type: string }
+                            avatar: { type: string }
+                            profileStatus: { type: string }
+                            online: { type: boolean }
+                            friendAt: { type: string, format: date-time }
+
+  # ============ Upload ============
+  /upload/image:
+    post:
+      tags: [Upload]
+      summary: 上传图片到阿里云 OSS
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file: { type: string, format: binary }
+      responses:
+        '200':
+          description: 返回 OSS 访问 URL
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code: { type: integer, example: 0 }
+                  data:
+                    type: object
+                    properties:
+                      url: { type: string, example: "https://mental-healthy.oss-cn-beijing.aliyuncs.com/mental-health/img/2026-05-31/abc.jpg" }
+
+  /upload/video:
+    post:
+      tags: [Upload]
+      summary: 上传视频
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file: { type: string, format: binary }
+      responses:
+        '200': { description: OK }
+
+  # ============ Community ============
+  /post/list:
+    get:
+      tags: [Community]
+      summary: 帖子流（推荐 / 关注 / 最新）
+      parameters:
+        - { name: type, in: query, schema: { type: string, enum: [recommend, follow, latest], default: recommend } }
+        - { name: page, in: query, schema: { type: integer, default: 1 } }
+        - { name: size, in: query, schema: { type: integer, default: 10 } }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResult'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          total: { type: integer }
+                          list:
+                            type: array
+                            items: { $ref: '#/components/schemas/Post' }
+
+  /post/{id}:
+    get:
+      tags: [Community]
+      summary: 帖子详情
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        '200': { description: OK }
+
+  /post/publish:
+    post:
+      tags: [Community]
+      summary: 发布帖子
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [content]
+              properties:
+                content: { type: string }
+                images: { type: array, items: { type: string } }
+                video: { type: string }
+                topic: { type: string, description: 话题标签（可选） }
+      responses:
+        '200': { description: OK }
+
+  /post/{id}/delete:
+    delete:
+      tags: [Community]
+      summary: 删除我的帖子
+      security: [{ bearerAuth: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      responses:
+        '200': { description: OK }
+
+  /post/{id}/like:
+    post:
+      tags: [Community]
+      summary: 点赞 / 取消点赞
+      security: [{ bearerAuth: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      responses:
+        '200': { description: OK }
+
+  /post/{id}/collect:
+    post:
+      tags: [Community]
+      summary: 收藏 / 取消收藏
+      security: [{ bearerAuth: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      responses:
+        '200': { description: OK }
+
+  /post/{id}/comments:
+    get:
+      tags: [Community]
+      summary: 帖子评论列表
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+        - { name: page, in: query, schema: { type: integer, default: 1 } }
+      responses:
+        '200': { description: OK }
+
+  /post/{id}/comment:
+    post:
+      tags: [Community]
+      summary: 发表评论
+      security: [{ bearerAuth: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [content]
+              properties:
+                content: { type: string }
+                replyId: { type: integer, description: 回复的评论 id（可选） }
+      responses:
+        '200': { description: OK }
+
+  /post/my:
+    get:
+      tags: [Community]
+      summary: 我的发布
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { name: page, in: query, schema: { type: integer, default: 1 } }
+      responses:
+        '200': { description: OK }
+
+  /post/my-comments:
+    get:
+      tags: [Community]
+      summary: 我的评论
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { description: OK }
+
+  # ============ AI ============
+  /ai/sessions:
+    get:
+      tags: [AI]
+      summary: 会话列表
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { name: business, in: query, schema: { type: string, enum: [mental, study, general] } }
+      responses:
+        '200': { description: OK }
+    post:
+      tags: [AI]
+      summary: 创建会话
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [business]
+              properties:
+                business: { type: string, enum: [mental, study, general] }
+                title: { type: string }
+      responses:
+        '200': { description: OK }
+
+  /ai/sessions/{id}:
+    delete:
+      tags: [AI]
+      summary: 删除会话
+      security: [{ bearerAuth: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      responses:
+        '200': { description: OK }
+
+  /ai/sessions/{id}/messages:
+    get:
+      tags: [AI]
+      summary: 会话历史消息
+      security: [{ bearerAuth: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      responses:
+        '200': { description: OK }
+
+  /ai/chat:
+    post:
+      tags: [AI]
+      summary: 发送消息（SSE 流式返回）
+      description: |
+        返回 content-type: text/event-stream
+        每帧格式：
+        ```
+        data: {"delta":"你好"}
+        data: {"delta":"，"}
+        data: [DONE]
+        ```
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sessionId, content]
+              properties:
+                sessionId: { type: integer }
+                content: { type: string }
+      responses:
+        '200':
+          description: SSE 流
+          content:
+            text/event-stream:
+              schema: { type: string }
+
+  # ============ Message ============
+  /message/notifications:
+    get:
+      tags: [Message]
+      summary: 通知列表（点赞/评论/关注）
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { name: type, in: query, schema: { type: string, enum: [all, like, comment, follow] } }
+        - { name: page, in: query, schema: { type: integer, default: 1 } }
+      responses:
+        '200': { description: OK }
+
+  /message/unread-count:
+    get:
+      tags: [Message]
+      summary: 各类未读数
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { description: OK }
+
+  /message/read:
+    post:
+      tags: [Message]
+      summary: 标记已读
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type: { type: string, enum: [like, comment, follow, chat, all] }
+                ids: { type: array, items: { type: integer } }
+      responses:
+        '200': { description: OK }
+
+  /message/chats:
+    get:
+      tags: [Message]
+      summary: 私信会话列表
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { description: OK }
+
+  /message/chats/{userId}:
+    get:
+      tags: [Message]
+      summary: 与某人的聊天记录
+      security: [{ bearerAuth: [] }]
+      parameters: [{ name: userId, in: path, required: true, schema: { type: integer } }]
+      responses:
+        '200': { description: OK }
+
+  /message/send:
+    post:
+      tags: [Message]
+      summary: 发送私信（也可走 WebSocket）
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [toUserId, content]
+              properties:
+                toUserId: { type: integer }
+                content: { type: string }
+                type: { type: string, enum: [text, image], default: text }
+      responses:
+        '200': { description: OK }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    ApiResult:
+      type: object
+      properties:
+        code: { type: integer, example: 0, description: "0=成功，其他=错误" }
+        msg: { type: string, example: ok }
+        data: {}
+    LoginResult:
+      type: object
+      properties:
+        code: { type: integer }
+        msg: { type: string }
+        data:
+          type: object
+          properties:
+            token: { type: string }
+            refreshToken: { type: string }
+            user: { $ref: '#/components/schemas/User' }
+    User:
+      type: object
+      properties:
+        id: { type: integer }
+        username: { type: string }
+        nickname: { type: string }
+        avatar: { type: string }
+        bio: { type: string }
+        gender: { type: integer }
+    Post:
+      type: object
+      properties:
+        id: { type: integer }
+        userId: { type: integer }
+        nickname: { type: string }
+        avatar: { type: string }
+        content: { type: string }
+        images: { type: array, items: { type: string } }
+        video: { type: string }
+        likeCount: { type: integer }
+        commentCount: { type: integer }
+        liked: { type: boolean }
+        collected: { type: boolean }
+        createdAt: { type: string, format: date-time }

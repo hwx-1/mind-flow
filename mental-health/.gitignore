@@ -1,0 +1,30 @@
+# IDE
+.idea/
+.vscode/
+*.iml
+.DS_Store
+
+# Java / Maven
+target/
+*.class
+*.jar
+!mental-health.jar
+.mvn/
+mvnw
+mvnw.cmd
+
+# 鸿蒙
+build/
+oh_modules/
+.hvigor/
+.cxx/
+.preview/
+*.har
+.clangd
+.clang-format
+local.properties
+
+# 日志/敏感
+*.log
+application-prod.yml
+application-local.yml

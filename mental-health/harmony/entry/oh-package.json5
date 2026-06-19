@@ -1,0 +1,9 @@
+{
+  "name": "entry",
+  "version": "1.0.0",
+  "description": "AI Mental Health Assistant",
+  "main": "",
+  "author": "hwx",
+  "license": "MIT",
+  "dependencies": {}
+}

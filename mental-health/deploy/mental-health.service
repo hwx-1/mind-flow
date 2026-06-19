@@ -1,0 +1,18 @@
+[Unit]
+Description=Mental Health Backend
+After=network.target mysqld.service redis.service
+
+[Service]
+Type=simple
+User=www
+Group=www
+WorkingDirectory=/www/wwwroot/mental-health
+ExecStart=/usr/bin/java -Xms512m -Xmx1024m -jar /www/wwwroot/mental-health/mental-health.jar --spring.profiles.active=prod
+SuccessExitStatus=143
+Restart=always
+RestartSec=10
+StandardOutput=append:/www/wwwlogs/mental-health.out.log
+StandardError=append:/www/wwwlogs/mental-health.err.log
+
+[Install]
+WantedBy=multi-user.target
